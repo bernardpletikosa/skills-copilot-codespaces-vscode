@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Todo List</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        .todo-item {
+            margin-bottom: 10px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            background-color: #f9f9f9;
+        }
+
+        .todo-item .material-icons {
+            margin-right: 10px;
+            color: #888;
+        }
+
+        .todo-input {
+            margin-bottom: 10px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        #addTodoButton {
+            margin-top: 10px;
+            padding: 10px 20px;
+            background-color: #4caf50;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        #addTodoButton:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Todo List</h1>
+        <div id="todoList"></div>
+                <input type="text" id="todoInput" class="todo-input" placeholder="Enter a new todo">
+                <button id="addTodoButton">Add Todo</button>
+            </div>
+
+            <script>
+                // Fetch todos from the server and populate the list
+                fetch('http://localhost:3000/todos', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Access-Control-Allow-Origin': '*'
+                    },
+                    mode: 'cors'
+                })
+                    .then(response => response.json())
+                                        .then(todos => {
+                                            const todoList = document.getElementById('todoList');
+
+                                            // Check if todos is an array
+                                            if (Array.isArray(todos)) {
+                                                todos.forEach(todo => {
+                                                    const todoItem = document.createElement('div');
+                                                    todoItem.classList.add('todo-item');
+                                                    todoItem.innerText = todo.title;
+                                                    todoList.appendChild(todoItem);
+                                                });
+                                            }
+                                        });
+
+                // Add a new todo item
+                const addTodoButton = document.getElementById('addTodoButton');
+                const todoInput = document.getElementById('todoInput');
+                addTodoButton.addEventListener('click', () => {
+                    const newTodo = todoInput.value;
+                    if (newTodo) {
+                        // Send the new todo to the server
+                        fetch('http://localhost:3000/todos', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Access-Control-Allow-Origin': '*'
+                            },
+                            body: JSON.stringify({ title: newTodo }),
+                            mode: 'cors'
+                        })
+                            .then(response => response.json())
+                            .then(todo => {
+                                const todoItem = document.createElement('div');
+                                todoItem.classList.add('todo-item');
+                                todoItem.innerText = todo.title;
+                                todoList.appendChild(todoItem);
+                                todoInput.value = '';
+                            });
+                    }
+                });
+            </script>
+        </body>
+        </html>
